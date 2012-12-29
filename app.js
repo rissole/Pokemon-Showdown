@@ -243,7 +243,8 @@ var app;
 var server;
 if (config.protocol === 'io') {
 	server = require('socket.io').listen(config.port).set('log level', 1);
-	server.set('transports', ['websocket', 'htmlfile', 'xhr-polling']); // temporary hack until https://github.com/LearnBoost/socket.io/issues/609 is fixed
+	server.set('transports', ['xhr-polling']); // temporary hack until https://github.com/LearnBoost/socket.io/issues/609 is fixed
+	server.set('polling duration', 10);
 } else if (config.protocol === 'eio') {
 	app = require('http').createServer().listen(config.port);
 	server = require('engine.io').attach(app);
