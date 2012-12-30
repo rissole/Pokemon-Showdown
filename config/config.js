@@ -7,7 +7,7 @@ exports.setuid = '';
 
 // protocol - WebSockets ("ws") or Socket.IO ("io").
 //	We recommend using WebSockets unless you have a really compelling reason not to.
-exports.protocol = 'io';
+exports.protocol = 'ws';
 
 // The server ID - a unique ID describing this Showdown server
 exports.serverid = 'milk server';
