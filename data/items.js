@@ -589,7 +589,7 @@ exports.BattleItems = {
 				}
 			}
 		},
-		desc: "Activates at 25% HP. Next move used goes first. Unobtainable in BW. One-time use."
+		desc: "Activates at 25% HP. Next move used goes first. One-time use."
 	},
 	"damprock": {
 		id: "damprock",
@@ -769,7 +769,7 @@ exports.BattleItems = {
 			}
 		},
 		onAfterMoveSecondary: function(target, source, move) {
-			if (source && source !== target && move && move.category !== 'Status') {
+			if (source && source !== target && target.hp && move && move.category !== 'Status') {
 				if (target.useItem()) {
 					target.switchFlag = true;
 				}
@@ -1315,7 +1315,6 @@ exports.BattleItems = {
 		id: "jabocaberry",
 		name: "Jaboca Berry",
 		spritenum: 230,
-		isUnreleased: true,
 		isBerry: true,
 		naturalGift: {
 			basePower: 80,
@@ -1329,7 +1328,7 @@ exports.BattleItems = {
 			}
 		},
 		onEat: function() { },
-		desc: "If hit by a physical attack, the attacker takes 12.5% damage. Unobtainable in BW. One-time use."
+		desc: "If hit by a physical attack, the attacker takes 12.5% damage. One-time use."
 	},
 	"kasibberry": {
 		id: "kasibberry",
@@ -2294,7 +2293,7 @@ exports.BattleItems = {
 			basePower: 10
 		},
 		onAfterMoveSecondary: function(target, source, move) {
-			if (source && source !== target && move && move.category !== 'Status') {
+			if (source && source !== target && source.hp && target.hp && move && move.category !== 'Status') {
 				if (target.useItem()) { // This order is correct - the item is used up even against a pokemon with Ingrain or that otherwise can't be forced out
 					if (this.runEvent('DragOut', source, target, move)) {
 						this.dragIn(source.side, source.position);
@@ -2646,7 +2645,7 @@ exports.BattleItems = {
 				stats.spd *= 1.5;
 			}
 		},
-		desc: "Raises Special Attack and Special Defense by 50% if the holder is Latias or Latios. Unobtainable in BW."
+		desc: "Raises Special Attack and Special Defense by 50% if the holder is Latias or Latios."
 	},
 	"spelltag": {
 		id: "spelltag",

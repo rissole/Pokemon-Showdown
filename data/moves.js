@@ -137,8 +137,8 @@ exports.BattleMovedex = {
 		accuracy: true,
 		basePower: 60,
 		category: "Physical",
-		desc: "Deals damage to one adjacent or non-adjacent target and ignores accuracy and evasion modifiers. Makes contact.",
-		shortDesc: "Ignores accuracy and evasion modifiers.",
+		desc: "Deals damage to one adjacent or non-adjacent target and does not check accuracy. Makes contact.",
+		shortDesc: "This move does not check accuracy.",
 		id: "aerialace",
 		isViable: true,
 		name: "Aerial Ace",
@@ -373,7 +373,7 @@ exports.BattleMovedex = {
 		accuracy: 100,
 		basePower: 15,
 		category: "Physical",
-		desc: "Deals damage to one adjacent target and hits two to five times. Has a 35% chance to hit two or three times, and a 15% chance to hit four or five times. If one of the hits breaks the target's Substitute, it will take damage for the remaining hits. If the user has the Ability Skill Link, this move will always hit five times. Makes contact.",
+		desc: "Deals damage to one adjacent target and hits two to five times. Has a 1/3 chance to hit two or three times, and a 1/6 chance to hit four or five times. If one of the hits breaks the target's Substitute, it will take damage for the remaining hits. If the user has the Ability Skill Link, this move will always hit five times. Makes contact.",
 		shortDesc: "Hits 2-5 times in one turn.",
 		id: "armthrust",
 		name: "Arm Thrust",
@@ -540,8 +540,8 @@ exports.BattleMovedex = {
 		accuracy: true,
 		basePower: 90,
 		category: "Special",
-		desc: "Deals damage to one adjacent or non-adjacent target and ignores accuracy and evasion modifiers.",
-		shortDesc: "Ignores accuracy and evasion modifiers.",
+		desc: "Deals damage to one adjacent or non-adjacent target and does not check accuracy.",
+		shortDesc: "This move does not check accuracy.",
 		id: "aurasphere",
 		isViable: true,
 		name: "Aura Sphere",
@@ -647,7 +647,7 @@ exports.BattleMovedex = {
 		accuracy: 85,
 		basePower: 15,
 		category: "Physical",
-		desc: "Deals damage to one adjacent target and hits two to five times. Has a 35% chance to hit two or three times, and a 15% chance to hit four or five times. If one of the hits breaks the target's Substitute, it will take damage for the remaining hits. If the user has the Ability Skill Link, this move will always hit five times.",
+		desc: "Deals damage to one adjacent target and hits two to five times. Has a 1/3 chance to hit two or three times, and a 1/6 chance to hit four or five times. If one of the hits breaks the target's Substitute, it will take damage for the remaining hits. If the user has the Ability Skill Link, this move will always hit five times.",
 		shortDesc: "Hits 2-5 times in one turn.",
 		id: "barrage",
 		name: "Barrage",
@@ -722,6 +722,12 @@ exports.BattleMovedex = {
 			duration: 1,
 			onStart: function(pokemon) {
 				this.effectData.index = 0;
+				while (pokemon.side.pokemon[this.effectData.index] !== pokemon &&
+					(!pokemon.side.pokemon[this.effectData.index] ||
+					pokemon.side.pokemon[this.effectData.index].fainted ||
+					pokemon.side.pokemon[this.effectData.index].status)) {
+					this.effectData.index++;
+				}
 			},
 			onRestart: function(pokemon) {
 				do {
@@ -795,7 +801,7 @@ exports.BattleMovedex = {
 		accuracy: true,
 		basePower: false,
 		category: "Physical",
-		desc: "The user spends two turns locked into this move and then, on the second turn after using this move, the user attacks the last Pokemon that hit it, inflicting double the damage in HP it lost during the two turns. If the last Pokemon that hit it is no longer on the field, the user attacks a random foe instead. If the user is prevented from moving during this move's use, the effect ends. This move ignores accuracy and evasion modifiers and can hit Ghost-types. Makes contact. Priority +1.",
+		desc: "The user spends two turns locked into this move and then, on the second turn after using this move, the user attacks the last Pokemon that hit it, inflicting double the damage in HP it lost during the two turns. If the last Pokemon that hit it is no longer on the field, the user attacks a random foe instead. If the user is prevented from moving during this move's use, the effect ends. This move does not check accuracy and can hit Ghost-types. Makes contact. Priority +1.",
 		shortDesc: "Waits 2 turns; deals double the damage taken.",
 		id: "bide",
 		name: "Bide",
@@ -1042,7 +1048,7 @@ exports.BattleMovedex = {
 		accuracy: 90,
 		basePower: 25,
 		category: "Physical",
-		desc: "Deals damage to one adjacent target and hits two to five times. Has a 35% chance to hit two or three times, and a 15% chance to hit four or five times. If one of the hits breaks the target's Substitute, it will take damage for the remaining hits. If the user has the Ability Skill Link, this move will always hit five times.",
+		desc: "Deals damage to one adjacent target and hits two to five times. Has a 1/3 chance to hit two or three times, and a 1/6 chance to hit four or five times. If one of the hits breaks the target's Substitute, it will take damage for the remaining hits. If the user has the Ability Skill Link, this move will always hit five times.",
 		shortDesc: "Hits 2-5 times in one turn.",
 		id: "bonerush",
 		isViable: true,
@@ -1104,7 +1110,7 @@ exports.BattleMovedex = {
 				if (move.id === 'gust' || move.id === 'twister') {
 					return;
 				}
-				if (move.id === 'skyuppercut' || move.id === 'thunder' || move.id === 'hurricane' || move.id === 'smackdown') {
+				if (move.id === 'skyuppercut' || move.id === 'thunder' || move.id === 'hurricane' || move.id === 'smackdown' || move.id === 'helpinghand') {
 					return;
 				}
 				return 0;
@@ -1332,7 +1338,7 @@ exports.BattleMovedex = {
 		accuracy: 100,
 		basePower: 25,
 		category: "Physical",
-		desc: "Deals damage to one adjacent target and hits two to five times. Has a 35% chance to hit two or three times, and a 15% chance to hit four or five times. If one of the hits breaks the target's Substitute, it will take damage for the remaining hits. If the user has the Ability Skill Link, this move will always hit five times.",
+		desc: "Deals damage to one adjacent target and hits two to five times. Has a 1/3 chance to hit two or three times, and a 1/6 chance to hit four or five times. If one of the hits breaks the target's Substitute, it will take damage for the remaining hits. If the user has the Ability Skill Link, this move will always hit five times.",
 		shortDesc: "Hits 2-5 times in one turn.",
 		id: "bulletseed",
 		isViable: true,
@@ -1518,8 +1524,8 @@ exports.BattleMovedex = {
 		accuracy: 100,
 		basePower: 70,
 		category: "Physical",
-		desc: "Deals damage to one adjacent target and ignores the target's defensive stat stage changes, including accuracy and evasion modifiers. Makes contact.",
-		shortDesc: "Ignores the target's stat modifiers.",
+		desc: "Deals damage to one adjacent target and ignores the target's stat stage changes, including evasion. Makes contact.",
+		shortDesc: "Ignores the target's stat stage changes.",
 		id: "chipaway",
 		name: "Chip Away",
 		pp: 20,
@@ -1635,7 +1641,7 @@ exports.BattleMovedex = {
 		accuracy: 85,
 		basePower: 18,
 		category: "Physical",
-		desc: "Deals damage to one adjacent target and hits two to five times. Has a 35% chance to hit two or three times, and a 15% chance to hit four or five times. If one of the hits breaks the target's Substitute, it will take damage for the remaining hits. If the user has the Ability Skill Link, this move will always hit five times. Makes contact. Damage is boosted to 1.2x by the Ability Iron Fist.",
+		desc: "Deals damage to one adjacent target and hits two to five times. Has a 1/3 chance to hit two or three times, and a 1/6 chance to hit four or five times. If one of the hits breaks the target's Substitute, it will take damage for the remaining hits. If the user has the Ability Skill Link, this move will always hit five times. Makes contact. Damage is boosted to 1.2x by the Ability Iron Fist.",
 		shortDesc: "Hits 2-5 times in one turn.",
 		id: "cometpunch",
 		name: "Comet Punch",
@@ -2284,21 +2290,10 @@ exports.BattleMovedex = {
 		name: "Detect",
 		pp: 5,
 		priority: 4,
-		stallingMove: true, // decrease success of repeated use to 50%
+		stallingMove: true, // Note: stallingMove is not used anywhere.
 		volatileStatus: 'protect',
 		onTryHit: function(pokemon) {
-			if (!this.willAct()) {
-				return false;
-			}
-			var counter = 1;
-			if (pokemon.volatiles['stall']) {
-				counter = pokemon.volatiles['stall'].counter || 1;
-			}
-			if (counter >= 256) {
-				return (this.random()*4294967296 < 1); // 2^32 - special-cased because Battle.random(n) can't handle n > 2^16 - 1
-			}
-			this.debug("Success chance: "+Math.round(100/counter)+"%");
-			return (this.random(counter) === 0);
+			return this.willAct() && this.runEvent('StallMove', pokemon);
 		},
 		onHit: function(pokemon) {
 			pokemon.addVolatile('stall');
@@ -2339,7 +2334,7 @@ exports.BattleMovedex = {
 				if (type === 'sandstorm' || type === 'hail') return false;
 			},
 			onAccuracy: function(accuracy, target, source, move) {
-				if (move.id === 'earthquake' || move.id === 'magnitude') {
+				if (move.id === 'earthquake' || move.id === 'magnitude' || move.id === 'helpinghand') {
 					return;
 				}
 				return 0;
@@ -2468,7 +2463,7 @@ exports.BattleMovedex = {
 				if (type === 'sandstorm' || type === 'hail') return false;
 			},
 			onAccuracy: function(accuracy, target, source, move) {
-				if (move.id === 'surf' || move.id === 'whirlpool') {
+				if (move.id === 'surf' || move.id === 'whirlpool' || move.id === 'helpinghand') {
 					return;
 				}
 				return 0;
@@ -2596,7 +2591,7 @@ exports.BattleMovedex = {
 		accuracy: 85,
 		basePower: 15,
 		category: "Physical",
-		desc: "Deals damage to one adjacent target and hits two to five times. Has a 35% chance to hit two or three times, and a 15% chance to hit four or five times. If one of the hits breaks the target's Substitute, it will take damage for the remaining hits. If the user has the Ability Skill Link, this move will always hit five times. Makes contact.",
+		desc: "Deals damage to one adjacent target and hits two to five times. Has a 1/3 chance to hit two or three times, and a 1/6 chance to hit four or five times. If one of the hits breaks the target's Substitute, it will take damage for the remaining hits. If the user has the Ability Skill Link, this move will always hit five times. Makes contact.",
 		shortDesc: "Hits 2-5 times in one turn.",
 		id: "doubleslap",
 		name: "DoubleSlap",
@@ -2983,18 +2978,17 @@ exports.BattleMovedex = {
 		accuracy: 100,
 		basePower: false,
 		basePowerCallback: function(pokemon, target) {
-			var targetSpeed = target.stats.spe;
-			var pokemonSpeed = pokemon.stats.spe;
-			if (pokemonSpeed >= targetSpeed * 4) {
+			var ratio = (pokemon.stats.spe / target.stats.spe);
+			if (ratio >= 4) {
 				return 150;
 			}
-			if (pokemonSpeed >= targetSpeed * 3) {
+			if (ratio >= 3) {
 				return 120;
 			}
-			if (pokemonSpeed >= targetSpeed * 2) {
+			if (ratio >= 2) {
 				return 80;
 			}
-			if (pokemonSpeed >= targetSpeed) {
+			if (ratio >= 1) {
 				return 60;
 			}
 			return 40;
@@ -3138,7 +3132,7 @@ exports.BattleMovedex = {
 					return;
 				}
 				var decision = this.willMove(pokemon);
-				if (decision) {
+				if (decision && toId(decision.move) !== this.effectData.move) {
 					this.changeDecision(pokemon, {move:this.effectData.move});
 				}
 			}
@@ -3181,21 +3175,10 @@ exports.BattleMovedex = {
 		name: "Endure",
 		pp: 10,
 		priority: 4,
-		stallingMove: true, // decrease success of repeated use to 50%
+		stallingMove: true, // Note: stallingMove is not used anywhere.
 		volatileStatus: 'endure',
 		onTryHit: function(pokemon) {
-			if (!this.willAct()) {
-				return false;
-			}
-			var counter = 1;
-			if (pokemon.volatiles['stall']) {
-				counter = pokemon.volatiles['stall'].counter || 1;
-			}
-			if (counter >= 256) {
-				return (this.random()*4294967296 < 1); // 2^32 - special-cased because Battle.random(n) can't handle n > 2^16 - 1
-			}
-			this.debug("Success chance: "+Math.round(100/counter)+"%");
-			return (this.random(counter) === 0);
+			return this.willAct() && this.runEvent('StallMove', pokemon);
 		},
 		onHit: function(pokemon) {
 			pokemon.addVolatile('stall');
@@ -3367,8 +3350,8 @@ exports.BattleMovedex = {
 		accuracy: true,
 		basePower: 60,
 		category: "Physical",
-		desc: "Deals damage to one adjacent target and ignores accuracy and evasion modifiers. Makes contact.",
-		shortDesc: "Ignores accuracy and evasion modifiers.",
+		desc: "Deals damage to one adjacent target and does not check accuracy. Makes contact.",
+		shortDesc: "This move does not check accuracy.",
 		id: "faintattack",
 		name: "Faint Attack",
 		pp: 20,
@@ -3915,7 +3898,7 @@ exports.BattleMovedex = {
 				if (move.id === 'gust' || move.id === 'twister') {
 					return;
 				}
-				if (move.id === 'skyuppercut' || move.id === 'thunder' || move.id === 'hurricane' || move.id === 'smackdown') {
+				if (move.id === 'skyuppercut' || move.id === 'thunder' || move.id === 'hurricane' || move.id === 'smackdown' || move.id === 'helpinghand') {
 					return;
 				}
 				return 0;
@@ -4199,7 +4182,7 @@ exports.BattleMovedex = {
 		accuracy: 85,
 		basePower: 15,
 		category: "Physical",
-		desc: "Deals damage to one adjacent target and hits two to five times. Has a 35% chance to hit two or three times, and a 15% chance to hit four or five times. If one of the hits breaks the target's Substitute, it will take damage for the remaining hits. If the user has the Ability Skill Link, this move will always hit five times. Makes contact.",
+		desc: "Deals damage to one adjacent target and hits two to five times. Has a 1/3 chance to hit two or three times, and a 1/6 chance to hit four or five times. If one of the hits breaks the target's Substitute, it will take damage for the remaining hits. If the user has the Ability Skill Link, this move will always hit five times. Makes contact.",
 		shortDesc: "Hits 2-5 times in one turn.",
 		id: "furyattack",
 		name: "Fury Attack",
@@ -4253,7 +4236,7 @@ exports.BattleMovedex = {
 		accuracy: 80,
 		basePower: 18,
 		category: "Physical",
-		desc: "Deals damage to one adjacent target and hits two to five times. Has a 35% chance to hit two or three times, and a 15% chance to hit four or five times. If one of the hits breaks the target's Substitute, it will take damage for the remaining hits. If the user has the Ability Skill Link, this move will always hit five times. Makes contact.",
+		desc: "Deals damage to one adjacent target and hits two to five times. Has a 1/3 chance to hit two or three times, and a 1/6 chance to hit four or five times. If one of the hits breaks the target's Substitute, it will take damage for the remaining hits. If the user has the Ability Skill Link, this move will always hit five times. Makes contact.",
 		shortDesc: "Hits 2-5 times in one turn.",
 		id: "furyswipes",
 		name: "Fury Swipes",
@@ -5269,7 +5252,7 @@ exports.BattleMovedex = {
 		isContact: true,
 		hasCustomRecoil: true,
 		onMoveFail: function(target, source, move) {
-			this.damage(source.maxhp/2, source);
+			this.damage(source.maxhp/2, source, source, {id:'hijumpkick'});
 		},
 		secondary: false,
 		target: "normal",
@@ -5784,14 +5767,13 @@ exports.BattleMovedex = {
 				}
 			},
 			onResidual: function(target) {
-				var move = this.getMove(target.lastMove);
-				if (move.id !== 'iceball') {
+				if (target.lastMove === 'struggle') {
 					// don't lock
 					delete target.volatiles['iceball'];
 				}
 			},
 			onBeforeTurn: function(pokemon) {
-				if (pokemon.lastMove === 'iceball') {
+				if (pokemon.lastMove !== 'struggle') {
 					this.debug('Forcing into Ice Ball');
 					this.changeDecision(pokemon, {move: 'iceball'});
 				}
@@ -5940,7 +5922,7 @@ exports.BattleMovedex = {
 		accuracy: 100,
 		basePower: 25,
 		category: "Physical",
-		desc: "Deals damage to one adjacent target and hits two to five times. Has a 35% chance to hit two or three times, and a 15% chance to hit four or five times. If one of the hits breaks the target's Substitute, it will take damage for the remaining hits. If the user has the Ability Skill Link, this move will always hit five times.",
+		desc: "Deals damage to one adjacent target and hits two to five times. Has a 1/3 chance to hit two or three times, and a 1/6 chance to hit four or five times. If one of the hits breaks the target's Substitute, it will take damage for the remaining hits. If the user has the Ability Skill Link, this move will always hit five times.",
 		shortDesc: "Hits 2-5 times in one turn.",
 		id: "iciclespear",
 		isViable: true,
@@ -5986,6 +5968,7 @@ exports.BattleMovedex = {
 		isSnatchable: true,
 		volatileStatus: 'imprison',
 		effect: {
+			noCopy: true,
 			onStart: function(target) {
 				this.add('-start', target, 'move: Imprison');
 			},
@@ -6173,7 +6156,7 @@ exports.BattleMovedex = {
 		isContact: true,
 		hasCustomRecoil: true,
 		onMoveFail: function(target, source, move) {
-			this.damage(source.maxhp/2, source);
+			this.damage(source.maxhp/2, source, source, {id:'jumpkick'});
 		},
 		secondary: false,
 		target: "normal",
@@ -6394,7 +6377,7 @@ exports.BattleMovedex = {
 		},
 		onTryHit: function(target) {
 			if (target.hasType('Grass')) {
-				this.add('-immune', target.id, '[msg]');
+				this.add('-immune', target, '[msg]');
 				return null;
 			}
 		},
@@ -6464,7 +6447,8 @@ exports.BattleMovedex = {
 			onFoeBasePower: function(basePower, attacker, defender, move) {
 				if (move.category === 'Special' && defender.side === this.effectData.target) {
 					if (!move.crit && attacker.ability !== 'infiltrator') {
-						this.debug('Light Screen weaken');
+						this.debug('Light Screen weaken')
+						if (attacker.side.active.length > 1) return basePower*2/3;
 						return basePower/2;
 					}
 				}
@@ -6695,7 +6679,7 @@ exports.BattleMovedex = {
 		accuracy: true,
 		basePower: 0,
 		category: "Status",
-		desc: "Until the end of the turn, the user is unaffected by certain non-damaging moves directed at it and will instead use such moves against the original user. Spikes, Stealth Rock, and Toxic Spikes can only be reflected once per side, by the leftmost Pokemon under this or the Ability Magic Bounce's effect. If the user has the Ability Soundproof, this move's effect happens before a sound-based move can be nullified. The Abilities Lightningrod and Storm Drain redirect their respective moves before this move takes effect. Priority +4.",
+		desc: "Until the end of the turn, the user is unaffected by certain non-damaging moves directed at it and will instead use such moves against the original user. Moves reflected in this way are unable to be reflected again by this or the Ability Magic Bounce's effect. Spikes, Stealth Rock, and Toxic Spikes can only be reflected once per side, by the leftmost Pokemon under this or the Ability Magic Bounce's effect. If the user has the Ability Soundproof, this move's effect happens before a sound-based move can be nullified. The Abilities Lightningrod and Storm Drain redirect their respective moves before this move takes effect. Priority +4.",
 		shortDesc: "Bounces back certain non-damaging moves.",
 		id: "magiccoat",
 		isViable: true,
@@ -6781,8 +6765,8 @@ exports.BattleMovedex = {
 		accuracy: true,
 		basePower: 60,
 		category: "Special",
-		desc: "Deals damage to one adjacent target and ignores accuracy and evasion modifiers.",
-		shortDesc: "Ignores accuracy and evasion modifiers.",
+		desc: "Deals damage to one adjacent target and does not check accuracy.",
+		shortDesc: "This move does not check accuracy.",
 		id: "magicalleaf",
 		name: "Magical Leaf",
 		pp: 20,
@@ -6813,8 +6797,8 @@ exports.BattleMovedex = {
 		accuracy: true,
 		basePower: 60,
 		category: "Physical",
-		desc: "Deals damage to one adjacent target and ignores accuracy and evasion modifiers.",
-		shortDesc: "Ignores accuracy and evasion modifiers.",
+		desc: "Deals damage to one adjacent target and does not check accuracy.",
+		shortDesc: "This move does not check accuracy.",
 		id: "magnetbomb",
 		name: "Magnet Bomb",
 		pp: 20,
@@ -7961,8 +7945,13 @@ exports.BattleMovedex = {
 			this.add('-fieldactivate', 'move: Perish Song');
 			for (var i=0; i<this.sides.length; i++) {
 				for (var j=0; j<this.sides[i].active.length; j++) {
-					if (this.sides[i].active[j].runImmunity('sound')) this.sides[i].active[j].addVolatile('perishsong');
-					else this.add('-end', this.sides[i].active[j], 'Perish Song');
+					if (this.sides[i].active[j].ability !== 'soundproof') {
+						this.sides[i].active[j].addVolatile('perishsong');
+					}
+					else {
+						this.add('-immune', this.sides[i].active[j], '[msg]');
+						this.add('-end', this.sides[i].active[j], 'Perish Song');
+					}
 				}
 			}
 		},
@@ -8006,7 +7995,7 @@ exports.BattleMovedex = {
 		accuracy: 85,
 		basePower: 14,
 		category: "Physical",
-		desc: "Deals damage to one adjacent target and hits two to five times. Has a 35% chance to hit two or three times, and a 15% chance to hit four or five times. If one of the hits breaks the target's Substitute, it will take damage for the remaining hits. If the user has the Ability Skill Link, this move will always hit five times.",
+		desc: "Deals damage to one adjacent target and hits two to five times. Has a 1/3 chance to hit two or three times, and a 1/6 chance to hit four or five times. If one of the hits breaks the target's Substitute, it will take damage for the remaining hits. If the user has the Ability Skill Link, this move will always hit five times.",
 		shortDesc: "Hits 2-5 times in one turn.",
 		id: "pinmissile",
 		name: "Pin Missile",
@@ -8359,21 +8348,10 @@ exports.BattleMovedex = {
 		name: "Protect",
 		pp: 10,
 		priority: 4,
-		stallingMove: true, // decrease success of repeated use to 50%
+		stallingMove: true, // Note: stallingMove is not used anywhere.
 		volatileStatus: 'protect',
 		onTryHit: function(pokemon) {
-			if (!this.willAct()) {
-				return false;
-			}
-			var counter = 1;
-			if (pokemon.volatiles['stall']) {
-				counter = pokemon.volatiles['stall'].counter || 1;
-			}
-			if (counter >= 256) {
-				return (this.random()*4294967296 < 1); // 2^32 - special-cased because Battle.random(n) can't handle n > 2^16 - 1
-			}
-			this.debug("Success chance: "+Math.round(100/counter)+"%");
-			return (this.random(counter) === 0);
+			return this.willAct() && this.runEvent('StallMove', pokemon);
 		},
 		onHit: function(pokemon) {
 			pokemon.addVolatile('stall');
@@ -8709,19 +8687,9 @@ exports.BattleMovedex = {
 		priority: 3,
 		isSnatchable: true,
 		sideCondition: 'quickguard',
+		stallingMove: true, // Note: stallingMove is not used anywhere.
 		onTryHitSide: function(side, source) {
-			if (!this.willAct()) {
-				return false;
-			}
-			var counter = 1;
-			if (source.volatiles['stall']) {
-				counter = source.volatiles['stall'].counter || 1;
-			}
-			if (counter >= 256) {
-				return (this.random()*4294967296 < 1); // 2^32 - special-cased because Battle.random(n) can't handle n > 2^16 - 1
-			}
-			this.debug("Success chance: "+Math.round(100/counter)+"%");
-			return (this.random(counter) === 0);
+			return this.willAct() && this.runEvent('StallMove', source);
 		},
 		onHitSide: function(side, source) {
 			source.addVolatile('stall');
@@ -8995,6 +8963,7 @@ exports.BattleMovedex = {
 				if (move.category === 'Physical' && defender.side === this.effectData.target) {
 					if (!move.crit && attacker.ability !== 'infiltrator') {
 						this.debug('Reflect weaken');
+						if (attacker.side.active.length > 1) return basePower*2/3;
 						return basePower/2;
 					}
 				}
@@ -9257,7 +9226,7 @@ exports.BattleMovedex = {
 		accuracy: 90,
 		basePower: 25,
 		category: "Physical",
-		desc: "Deals damage to one adjacent target and hits two to five times. Has a 35% chance to hit two or three times, and a 15% chance to hit four or five times. If one of the hits breaks the target's Substitute, it will take damage for the remaining hits. If the user has the Ability Skill Link, this move will always hit five times.",
+		desc: "Deals damage to one adjacent target and hits two to five times. Has a 1/3 chance to hit two or three times, and a 1/6 chance to hit four or five times. If one of the hits breaks the target's Substitute, it will take damage for the remaining hits. If the user has the Ability Skill Link, this move will always hit five times.",
 		shortDesc: "Hits 2-5 times in one turn.",
 		id: "rockblast",
 		isViable: true,
@@ -9487,14 +9456,13 @@ exports.BattleMovedex = {
 				}
 			},
 			onResidual: function(target) {
-				var move = this.getMove(target.lastMove);
-				if (move.id !== 'rollout') {
+				if (target.lastMove === 'struggle') {
 					// don't lock
 					delete target.volatiles['rollout'];
 				}
 			},
 			onBeforeTurn: function(pokemon) {
-				if (pokemon.lastMove === 'rollout') {
+				if (pokemon.lastMove !== 'struggle') {
 					this.debug('Forcing into Rollout');
 					this.changeDecision(pokemon, {move: 'rollout'});
 				}
@@ -9581,8 +9549,8 @@ exports.BattleMovedex = {
 		accuracy: 100,
 		basePower: 90,
 		category: "Physical",
-		desc: "Deals damage to one adjacent target and ignores the target's defensive stat stage changes, including accuracy and evasion modifiers. Makes contact.",
-		shortDesc: "Ignores the target's stat modifiers.",
+		desc: "Deals damage to one adjacent target and ignores the target's stat stage changes, including evasion. Makes contact.",
+		shortDesc: "Ignores the target's stat stage changes.",
 		id: "sacredsword",
 		isViable: true,
 		name: "Sacred Sword",
@@ -9618,7 +9586,13 @@ exports.BattleMovedex = {
 			},
 			onSetStatus: function(status, target, source, effect) {
 				if (source && source !== target && source.ability !== 'infiltrator' || (effect && effect.id === 'toxicspikes')) {
-					this.debug('interrupting setstatus');
+					this.debug('interrupting setStatus');
+					return false;
+				}
+			},
+			onTryConfusion: function(target, source, effect) {
+				if (source && source !== target && source.ability !== 'infiltrator') {
+					this.debug('interrupting addVolatile');
 					return false;
 				}
 			},
@@ -9961,6 +9935,9 @@ exports.BattleMovedex = {
 			duration: 2,
 			onLockMove: 'shadowforce',
 			onAccuracy: function(accuracy, target, source, move) {
+				if (move.id === 'helpinghand') {
+					return;
+				}
 				return 0;
 			}
 		},
@@ -9973,8 +9950,8 @@ exports.BattleMovedex = {
 		accuracy: true,
 		basePower: 60,
 		category: "Physical",
-		desc: "Deals damage to one adjacent target and ignores accuracy and evasion modifiers. Makes contact. Damage is boosted to 1.2x by the Ability Iron Fist.",
-		shortDesc: "Ignores accuracy and evasion modifiers.",
+		desc: "Deals damage to one adjacent target and does not check accuracy. Makes contact. Damage is boosted to 1.2x by the Ability Iron Fist.",
+		shortDesc: "This move does not check accuracy.",
 		id: "shadowpunch",
 		isViable: true,
 		name: "Shadow Punch",
@@ -10089,8 +10066,8 @@ exports.BattleMovedex = {
 		accuracy: true,
 		basePower: 60,
 		category: "Special",
-		desc: "Deals damage to one adjacent target and ignores accuracy and evasion modifiers.",
-		shortDesc: "Ignores accuracy and evasion modifiers.",
+		desc: "Deals damage to one adjacent target and does not check accuracy.",
+		shortDesc: "This move does not check accuracy.",
 		id: "shockwave",
 		name: "Shock Wave",
 		pp: 20,
@@ -10345,12 +10322,12 @@ exports.BattleMovedex = {
 			if (attacker.removeVolatile(move.id)) {
 				return;
 			}
-			if (defender.volatiles['substitute']) {
-				this.add('-fail', target);
+			if (defender.volatiles['substitute'] || defender.side === attacker.side) {
+				this.add('-fail', defender);
 				return null;
 			}
 			if (defender.volatiles['protect']) {
-				this.add('-activate', target, 'Protect');
+				this.add('-activate', defender, 'Protect');
 				return null;
 			}
 			if (defender.volatiles['bounce'] || defender.volatiles['dig'] || defender.volatiles['dive'] || defender.volatiles['fly'] || defender.volatiles['shadowforce']) {
@@ -10397,7 +10374,7 @@ exports.BattleMovedex = {
 				if (move.id === 'gust' || move.id === 'twister') {
 					return;
 				}
-				if (move.id === 'skyuppercut' || move.id === 'thunder' || move.id === 'hurricane' || move.id === 'smackdown') {
+				if (move.id === 'skyuppercut' || move.id === 'thunder' || move.id === 'hurricane' || move.id === 'smackdown' || move.id === 'helpinghand') {
 					return;
 				}
 				return 0;
@@ -10930,7 +10907,7 @@ exports.BattleMovedex = {
 		accuracy: 100,
 		basePower: 20,
 		category: "Physical",
-		desc: "Deals damage to one adjacent target and hits two to five times. Has a 35% chance to hit two or three times, and a 15% chance to hit four or five times. If one of the hits breaks the target's Substitute, it will take damage for the remaining hits. If the user has the Ability Skill Link, this move will always hit five times.",
+		desc: "Deals damage to one adjacent target and hits two to five times. Has a 1/3 chance to hit two or three times, and a 1/6 chance to hit four or five times. If one of the hits breaks the target's Substitute, it will take damage for the remaining hits. If the user has the Ability Skill Link, this move will always hit five times.",
 		shortDesc: "Hits 2-5 times in one turn.",
 		id: "spikecannon",
 		name: "Spike Cannon",
@@ -11655,8 +11632,8 @@ exports.BattleMovedex = {
 		accuracy: true,
 		basePower: 60,
 		category: "Special",
-		desc: "Deals damage to all adjacent foes and ignores accuracy and evasion modifiers.",
-		shortDesc: "Ignores accuracy and evasion modifiers of foes.",
+		desc: "Deals damage to all adjacent foes and does not check accuracy.",
+		shortDesc: "This move does not check accuracy. Hits foes.",
 		id: "swift",
 		name: "Swift",
 		pp: 20,
@@ -11800,7 +11777,7 @@ exports.BattleMovedex = {
 		accuracy: 85,
 		basePower: 25,
 		category: "Physical",
-		desc: "Deals damage to one adjacent target and hits two to five times. Has a 35% chance to hit two or three times, and a 15% chance to hit four or five times. If one of the hits breaks the target's Substitute, it will take damage for the remaining hits. If the user has the Ability Skill Link, this move will always hit five times. Makes contact.",
+		desc: "Deals damage to one adjacent target and hits two to five times. Has a 1/3 chance to hit two or three times, and a 1/6 chance to hit four or five times. If one of the hits breaks the target's Substitute, it will take damage for the remaining hits. If the user has the Ability Skill Link, this move will always hit five times. Makes contact.",
 		shortDesc: "Hits 2-5 times in one turn.",
 		id: "tailslap",
 		isViable: true,
@@ -12482,7 +12459,7 @@ exports.BattleMovedex = {
 			}
 		},
 		category: "Special",
-		desc: "Deals damage to one adjacent target and ignores accuracy and evasion modifiers. The power of this move is based on the amount of PP remaining after normal PP reduction and the Ability Pressure resolve. 200 power for 0PP, 80 power for 1PP, 60 power for 2PP, 50 power for 3PP, and 40 power for 4 or more PP. Makes contact.",
+		desc: "Deals damage to one adjacent target and does not check accuracy. The power of this move is based on the amount of PP remaining after normal PP reduction and the Ability Pressure resolve. 200 power for 0PP, 80 power for 1PP, 60 power for 2PP, 50 power for 3PP, and 40 power for 4 or more PP. Makes contact.",
 		shortDesc: "More power the fewer PP this move has left.",
 		id: "trumpcard",
 		name: "Trump Card",
@@ -12663,8 +12640,8 @@ exports.BattleMovedex = {
 		accuracy: true,
 		basePower: 70,
 		category: "Physical",
-		desc: "Deals damage to one adjacent target and ignores accuracy and evasion modifiers. Makes contact. Priority -1.",
-		shortDesc: "Ignores accuracy and evasion mods. Goes last.",
+		desc: "Deals damage to one adjacent target and does not check accuracy. Makes contact. Priority -1.",
+		shortDesc: "This move does not check accuracy. Goes last.",
 		id: "vitalthrow",
 		name: "Vital Throw",
 		pp: 10,
@@ -12932,19 +12909,9 @@ exports.BattleMovedex = {
 		priority: 3,
 		isSnatchable: true,
 		sideCondition: 'wideguard',
+		stallingMove: true, // Note: stallingMove is not used anywhere.
 		onTryHitSide: function(side, source) {
-			if (!this.willAct()) {
-				return false;
-			}
-			var counter = 1;
-			if (source.volatiles['stall']) {
-				counter = source.volatiles['stall'].counter || 1;
-			}
-			if (counter >= 256) {
-				return (this.random()*4294967296 < 1); // 2^32 - special-cased because Battle.random(n) can't handle n > 2^16 - 1
-			}
-			this.debug("Success chance: "+Math.round(100/counter)+"%");
-			return (this.random(counter) === 0);
+			return this.willAct() && this.runEvent('StallMove', source);
 		},
 		onHitSide: function(side, source) {
 			source.addVolatile('stall');
@@ -12956,8 +12923,8 @@ exports.BattleMovedex = {
 			},
 			onTryHitPriority: 1,
 			onTryHit: function(target, source, effect) {
-				// Wide Guard blocks spread moves
-				if (effect && (effect.target !== 'allAdjacent' && effect.target !== 'allAdjacentFoes')) {
+				// Wide Guard blocks damaging spread moves
+				if (effect && (effect.category === 'Status' || (effect.target !== 'allAdjacent' && effect.target !== 'allAdjacentFoes'))) {
 					return;
 				}
 				this.add('-activate', target, 'Wide Guard');

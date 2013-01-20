@@ -79,19 +79,15 @@ exports.BattleScripts = {
 		}
 
 		var damage = false;
-		var atLeastOne = false;
 		if (move.target === 'all' || move.target === 'foeSide' || move.target === 'allySide' || move.target === 'allyTeam') {
 			damage = this.moveHit(target, pokemon, move);
 		} else if (move.target === 'allAdjacent' || move.target === 'allAdjacentFoes') {
+			var targets = [];
 			if (move.target === 'allAdjacent') {
 				var allyActive = pokemon.side.active;
 				for (var i=0; i<allyActive.length; i++) {
 					if (allyActive[i] && Math.abs(i-pokemon.position)<=1 && i != pokemon.position && !allyActive[i].fainted) {
-						if (!atLeastOne) {
-							damage = 0;
-							atLeastOne = true;
-						}
-						damage += (this.rollMoveHit(allyActive[i], pokemon, move, true) || 0);
+						targets.push(allyActive[i]);
 					}
 				}
 			}
@@ -99,20 +95,21 @@ exports.BattleScripts = {
 			var foePosition = foeActive.length-pokemon.position-1;
 			for (var i=0; i<foeActive.length; i++) {
 				if (foeActive[i] && Math.abs(i-foePosition)<=1 && !foeActive[i].fainted) {
-					if (!atLeastOne) {
-						damage = 0;
-						atLeastOne = true;
-					}
-					damage += (this.rollMoveHit(foeActive[i], pokemon, move, true) || 0);
+					targets.push(foeActive[i]);
 				}
 			}
-			if (!atLeastOne) {
+			if (!targets.length) {
 				this.attrLastMove('[notarget]');
 				this.add('-notarget');
 				if (move.selfdestruct && this.gen == 5) {
 					this.faint(pokemon, pokemon, move);
 				}
 				return true;
+			}
+			if (targets.length > 1) move.spreadHit = true;
+			damage = 0;
+			for (var i=0; i<targets.length; i++) {
+				damage += (this.rollMoveHit(targets[i], pokemon, move, true) || 0);
 			}
 			if (!pokemon.hp) pokemon.faint();
 		} else {
@@ -192,10 +189,10 @@ exports.BattleScripts = {
 			if (hits.length) {
 				// yes, it's hardcoded... meh
 				if (hits[0] === 2 && hits[1] === 5) {
-					var roll = this.random(20);
-					if (roll < 7) hits = 2;
-					else if (roll < 14) hits = 3;
-					else if (roll < 17) hits = 4;
+					var roll = this.random(6);
+					if (roll < 2) hits = 2;
+					else if (roll < 4) hits = 3;
+					else if (roll < 5) hits = 4;
 					else hits = 5;
 				} else {
 					hits = this.random(hits[0],hits[1]+1);
@@ -720,7 +717,6 @@ exports.BattleScripts = {
 
 				case 'sleeptalk':
 					if (!hasMove['rest']) rejected = true;
-					if (hasMove['trick'] || hasMove['protect'] || hasMove['substitute'] || hasMove['bellydrum']) rejected = true;
 					break;
 				case 'endure':
 					if (!hasMove['flail'] && !hasMove['endeavor'] && !hasMove['reversal']) rejected = true;
@@ -730,6 +726,12 @@ exports.BattleScripts = {
 					break;
 				case 'storedpower':
 					if (!hasMove['cosmicpower'] && !setupType) rejected = true;
+					break;
+
+				// not useful together
+
+				case 'bellydrum': case 'encore': case 'protect': case 'pursuit': case 'stealthrock': case 'suckerpunch': case 'trick':
+					if (hasMove['rest'] && hasMove['sleeptalk']) rejected = true;
 					break;
 
 				// we only need to set up once
@@ -758,14 +760,14 @@ exports.BattleScripts = {
 				case 'knockoff': case 'protect': case 'perishsong': case 'magiccoat': case 'trick': case 'switcheroo':
 					if (setupType) rejected = true;
 					break;
-				case 'uturn': case 'voltswitch':
+				case 'uturn': case 'voltswitch': case 'relicsong':
 					if (setupType) rejected = true;
 					break;
 
 				// bit redundant to have both
 
 				case 'flamethrower':
-					if (hasMove['lavaplume'] || hasMove['overheat'] || hasMove['fireblast']) rejected = true;
+					if (hasMove['lavaplume'] || hasMove['overheat'] || hasMove['fireblast'] || hasMove['blueflare']) rejected = true;
 					break;
 				case 'overheat':
 					if (hasMove['fireblast']) rejected = true;
@@ -775,6 +777,9 @@ exports.BattleScripts = {
 					break;
 				case 'surf':
 					if (hasMove['scald'] || hasMove['hydropump']) rejected = true;
+					break;
+				case 'hydropump':
+					if (hasMove['razorshell'] || hasMove['scald']) rejected = true;
 					break;
 				case 'waterfall':
 					if (hasMove['aquatail']) rejected = true;
@@ -811,6 +816,9 @@ exports.BattleScripts = {
 					break;
 				case 'stoneedge':
 					if (hasMove['headsmash']) rejected = true;
+					break;
+				case 'bonemerang': case 'earthpower':
+					if (hasMove['earthquake']) rejected = true;
 					break;
 				case 'dragonclaw':
 					if (hasMove['outrage'] || hasMove['dragontail']) rejected = true;
@@ -940,6 +948,12 @@ exports.BattleScripts = {
 				if ((ability === 'Sheer Force' || ability === 'Serene Grace') && !counter['sheerforce']) {
 					rejectAbility = true;
 				}
+				if (ability === 'Hustle' && !counter['Physical']) {
+					rejectAbility = true;
+				}
+				if (ability === 'Prankster' && !counter['Status']) {
+					rejectAbility = true;
+				}
 				if (ability === 'Defiant' && !counter['Physical'] && !hasMove['batonpass']) {
 					rejectAbility = true;
 				}
@@ -992,6 +1006,8 @@ exports.BattleScripts = {
 				item = 'Focus Sash';
 			} else if (template.species === 'Unown') {
 				item = 'Choice Specs';
+			} else if ((template.species === 'Wynaut' || template.species === 'Wobbuffet') && hasMove['destinybond']) && Math.random()*2 > 1) {
+				item = 'Custap Berry';
 			} else if (hasMove['trick'] && hasMove['gyroball'] && (ability === 'Levitate' || hasType['Flying'])) {
 				item = 'Macho Brace';
 			} else if (hasMove['trick'] && hasMove['gyroball']) {
@@ -1002,7 +1018,7 @@ exports.BattleScripts = {
 				item = 'Choice Specs';
 			} else if (counter.Status <= 1 && (hasMove['trick'] || hasMove['switcheroo'])) {
 				item = 'Choice Scarf';
-			} else if (hasMove['rest'] && !hasMove['sleeptalk'] && ability !== 'Natural Cure') {
+			} else if (hasMove['rest'] && !hasMove['sleeptalk'] && ability !== 'Natural Cure' && ability !== 'Shed Skin') {
 				item = 'Chesto Berry';
 			} else if (hasMove['naturalgift']) {
 				item = 'Liechi Berry';
@@ -1066,7 +1082,7 @@ exports.BattleScripts = {
 			} else if (hasMove['reflect'] || hasMove['lightscreen']) {
 				// less priority than if you'd had both
 				item = 'Light Clay';
-			} else if (counter.Physical >= 4 && !hasMove['fakeout'] && !hasMove['suckerpunch'] && !hasMove['flamecharge']) {
+			} else if (counter.Physical >= 4 && !hasMove['fakeout'] && !hasMove['suckerpunch'] && !hasMove['flamecharge'] && !hasMove['rapidspin']) {
 				if (Math.random()*3 > 1) {
 					item = 'Choice Band';
 				} else {
@@ -1100,6 +1116,8 @@ exports.BattleScripts = {
 				item = 'Expert Belt';
 			} else if (i===0 && ability !== 'Sturdy') {
 				item = 'Focus Sash';
+			} else if (hasMove['outrage']) {
+				item = 'Lum Berry';
 
 			// this is the "REALLY can't think of a good item" cutoff
 			// why not always Leftovers? Because it's boring. :P
@@ -1153,7 +1171,7 @@ exports.BattleScripts = {
 			Dusclops: 84, Porygon2: 82, Chansey: 78,
 
 			// Weather or teammate dependent
-			Vulpix: 95, Excadrill: 78, Ninetales: 78, Tentacruel: 78, Toxicroak: 78, Venusaur: 78,
+			Snover: 95, Vulpix: 95, Excadrill: 78, Ninetales: 78, Tentacruel: 78, Toxicroak: 78, Venusaur: 78,
 
 			// Holistic judgment
 			Carvanha: 90, Blaziken: 74, Garchomp: 74, Thundurus: 74

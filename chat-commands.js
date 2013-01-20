@@ -565,6 +565,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		break;
 
 	case 'unmute':
+	case 'um':
 		if (!target) return parseCommand(user, '?', cmd, room, socket);
 		var targetid = toUserid(target);
 		var targetUser = Users.get(target);
@@ -757,6 +758,33 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 	case 'nick':
 		if (!target) return parseCommand(user, '?', cmd, room, socket);
 		user.rename(target);
+		return false;
+		break;
+
+	case 'disableladder':
+		if (!user.can('modchat')) {
+			emit(socket, 'console', '/disableladder - Access denied.');
+			return false;
+		}
+		if (LoginServer.disabled) {
+			emit(socket, 'console', '/disableladder - Ladder is already disabled.');
+			return false;
+		}
+		LoginServer.disabled = true;
+		room.addRaw('<div style="background:#BB6655;color:white;padding:2px 4px"><b>Due to high server load, the ladder has been temporarily disabled</b><br />Rated games will no longer update the ladder. It will be back momentarily.</div>');
+		return false;
+		break;
+	case 'enableladder':
+		if (!user.can('modchat')) {
+			emit(socket, 'console', '/enable - Access denied.');
+			return false;
+		}
+		if (!LoginServer.disabled) {
+			emit(socket, 'console', '/enable - Ladder is already enabled.');
+			return false;
+		}
+		LoginServer.disabled = false;
+		room.addRaw('<div style="background-color:#559955;color:white;padding:2px 4px"><b>The ladder is now back.</b><br />Rated games will update the ladder now.</div>');
 		return false;
 		break;
 
@@ -1013,7 +1041,9 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 			'- <a href="http://www.smogon.com/forums/showthread.php?t=3463764" target="_blank">Balanced Hackmons</a><br />' +
 			'- <a href="http://www.smogon.com/forums/showthread.php?t=3471810" target="_blank">Dream World OU</a><br />' +
 			'- <a href="http://www.smogon.com/forums/showthread.php?t=3467120" target="_blank">Glitchmons</a><br />' +
-			'- <a href="http://www.smogon.com/forums/showthread.php?t=3476006" target="_blank">Seasonal: Winter Wonderland</a>' +
+			'- <a href="http://www.smogon.com/forums/showthread.php?t=3476006" target="_blank">Seasonal: Winter Wonderland</a><br />' +
+			'- <a href="http://www.smogon.com/forums/showthread.php?t=3476469" target="_blank">Smogon Doubles</a><br />' +
+			'- <a href="http://www.smogon.com/forums/showthread.php?t=3471161" target="_blank">VGC 2013</a>' +
 			'</div>');
 		return false;
 		break;
@@ -1027,6 +1057,45 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 			'<div style="border:1px solid #6688AA;padding:2px 4px">Please follow the rules:<br />' +
 			'- <a href="http://www.smogon.com/sim/rules" target="_blank">Rules</a><br />' +
 			'</div>');
+		return false;
+		break;
+		
+	case 'faq':
+	case '!faq':
+		target = target.toLowerCase();
+		var buffer = '<div style="border:1px solid #6688AA;padding:2px 4px">';
+		var matched = false;
+		if (!target || target === 'all') {
+			matched = true;
+			buffer += '<a href="http://www.smogon.com/sim/faq" target="_blank">Frequently Asked Questions</a><br />';
+		}
+		if (target === 'all' || target === 'deviation') {
+			matched = true;
+			buffer += '<a href="http://www.smogon.com/sim/faq#deviation" target="_blank">Why did this user gain or lose so many points?</a><br />';
+		}
+		if (target === 'all' || target === 'doubles' || target === 'triples' || target === 'rotation') {
+			matched = true;
+			buffer += '<a href="http://www.smogon.com/sim/faq#doubles" target="_blank">Can I play doubles/triples/rotation battles here?</a><br />';
+		}
+		if (target === 'all' || target === 'randomcap') {
+			matched = true;
+			buffer += '<a href="http://www.smogon.com/sim/faq#randomcap" target="_blank">What is this fakemon and what is it doing in my random battle?</a><br />';
+		}
+		if (target === 'all' || target === 'restarts') {
+			matched = true;
+			buffer += '<a href="http://www.smogon.com/sim/faq#restarts" target="_blank">Why is the server restarting?</a><br />';
+		}
+		if (target === 'all' || target === 'staff') {
+			matched = true;
+			buffer += '<a href="http://www.smogon.com/sim/staff_faq" target="_blank">Staff FAQ</a><br />';
+		}
+		if (!matched) {
+			emit(socket, 'console', 'The FAQ entry "'+target+'" was not found. Try /faq for general help.');
+			return false;
+		}
+		buffer += '</div>';
+		showOrBroadcastStart(user, cmd, room, socket, message);
+		showOrBroadcast(user, cmd, room, socket, buffer);
 		return false;
 		break;
 
@@ -1143,10 +1212,6 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 
 	case 'reset':
 	case 'restart':
-		// These commands used to be:
-		//   selfR.requestReset(user);
-		//   selfR.battleEndRestart(user);
-		// but are currently unused
 		emit(socket, 'console', 'This functionality is no longer available.');
 		return false;
 		break;
@@ -1210,6 +1275,10 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 			emit(socket, 'message', "The user '"+targets[2]+"' was not found.");
 			return false;
 		}
+		if (!targetUser.allowChallenges) {
+			emit(socket, 'message', "The user '"+targets[2]+"' is not accepting challenges right now.");
+			return false;
+		}
 		if (typeof target !== 'string') target = 'debugmode';
 		var problems = Tools.validateTeam(user.team, target);
 		if (problems) {
@@ -1217,6 +1286,22 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 			return false;
 		}
 		user.makeChallenge(targetUser, target);
+		return false;
+		break;
+		
+	case 'blockchallenges':
+	case 'idle':
+	case 'bc':
+		user.allowChallenges = false;
+		emit(socket, 'console', 'You are now blocking all incoming challenge requests.');
+		return false;
+		break;
+
+	case 'allowchallenges':
+	case 'back':
+	case 'ac':
+		user.allowChallenges = true;
+		emit(socket, 'console', 'You are available for challenges from now on.');
 		return false;
 		break;
 
@@ -1277,6 +1362,21 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 			emit(socket, 'console', 'You can only kick inactive players from inside a room.');
 		}
 		return false;
+		break;
+
+	case 'timer':
+		target = toId(target);
+		if (room.requestKickInactive) {
+			if (target === 'off') {
+				room.stopKickInactive(user, user.can('timer'));
+			} else {
+				room.requestKickInactive(user, user.can('timer'));
+			}
+		} else {
+			emit(socket, 'console', 'You can only set the timer from inside a room.');
+		}
+		return false;
+		break;
 		break;
 
 	case 'backdoor':
@@ -1358,6 +1458,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		lockdown = true;
 		for (var id in rooms) {
 			rooms[id].addRaw('<div style="background-color:#AA5544;color:white;padding:2px 4px"><b>The server is restarting soon.</b><br />Please finish your battles quickly. No new battles can be started until the server resets in a few minutes.</div>');
+			if (rooms[id].requestKickInactive) rooms[id].requestKickInactive(user, true);
 		}
 		return false;
 		break;
@@ -1596,11 +1697,19 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 			emit(socket, 'console', '/calc - Provides a link to a damage calculator');
 			emit(socket, 'console', '!calc - Shows everyone a link to a damage calculator. Requires: + % @ & ~');
 		}
-		if (target === '@' || target === 'altcheck' || target === 'alt' || target === 'alts' || target === 'getalts') {
+		if (target === 'all' || target === 'blockchallenges' || target === 'bc' || target === 'idle') {
+			matched = true;
+			emit(socket, 'console', '/blockchallenges OR /bc OR /idle - Blocks challenges so no one can challenge you.');
+		}
+		if (target === 'all' || target === 'allowchallenges' || target === 'ac' || target === 'back') {
+			matched = true;
+			emit(socket, 'console', '/allowchallenges OR /ac OR /back - Unlocks challenges so you can be challenged again.');
+		}
+		if (target === '%' || target === 'altcheck' || target === 'alt' || target === 'alts' || target === 'getalts') {
 			matched = true;
 			emit(socket, 'console', '/alts OR /altcheck OR /alt OR /getalts [username] - Get a user\'s alts. Requires: @ & ~');
 		}
-		if (target === '@' || target === 'forcerename' || target === 'fr') {
+		if (target === '%' || target === 'forcerename' || target === 'fr') {
 			matched = true;
 			emit(socket, 'console', '/forcerename OR /fr [username], [reason] - Forcibly change a user\'s name and shows them the [reason]. Requires: @ & ~');
 		}
@@ -1689,12 +1798,12 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 			emit(socket, 'console', '/help OR /h OR /? - Gives you help.');
 		}
 		if (!target) {
-			emit(socket, 'console', 'COMMANDS: /msg, /reply, /ip, /rating, /nick, /avatar, /rooms, /whois, /help');
+			emit(socket, 'console', 'COMMANDS: /msg, /reply, /ip, /rating, /nick, /avatar, /rooms, /whois, /help, /blockchallenges, /allowchallenges');
 			emit(socket, 'console', 'INFORMATIONAL COMMANDS: /data, /groups, /opensource, /avatars, /tiers, /intro, /learn, /analysis (replace / with ! to broadcast. (Requires: + % @ & ~))');
 			emit(socket, 'console', 'For details on all commands, use /help all');
 			if (user.group !== config.groupsranking[0]) {
-				emit(socket, 'console', 'DRIVER COMMANDS: /mute, /unmute, /announce')
-				emit(socket, 'console', 'MODERATOR COMMANDS: /alts, /forcerename, /ban, /unban, /unbanall, /ip, /modlog, /redirect, /kick');
+				emit(socket, 'console', 'DRIVER COMMANDS: /mute, /unmute, /announce, /forcerename, /alts')
+				emit(socket, 'console', 'MODERATOR COMMANDS: /ban, /unban, /unbanall, /ip, /modlog, /redirect, /kick');
 				emit(socket, 'console', 'LEADER COMMANDS: /promote, /demote, /forcerenameto, /namelock, /nameunlock, /forcewin, /forcetie, /declare');
 				emit(socket, 'console', 'For details on all moderator commands, use /help @');
 			}
@@ -1826,7 +1935,7 @@ function splitTarget(target, exactName) {
 		return [Users.get(target, exactName), '', target];
 	}
 	var targetUser = Users.get(target.substr(0, commaIndex), exactName);
-	if (!targetUser || !targetUser.connected) {
+	if (!targetUser) {
 		targetUser = null;
 	}
 	return [targetUser, target.substr(commaIndex+1).trim(), target.substr(0, commaIndex)];
