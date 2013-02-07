@@ -136,7 +136,6 @@ var User = (function () {
 		this.authenticated = false;
 		this.userid = toUserid(this.name);
 		this.group = config.groupsranking[0];
-		this.allowChallenges = true;
 
 		var trainersprites = [1, 2, 101, 102, 169, 170, 265, 266];
 		this.avatar = trainersprites[Math.floor(Math.random()*trainersprites.length)];
@@ -166,6 +165,9 @@ var User = (function () {
 		}
 	}
 
+	User.prototype.blockChallenges = false;
+	User.prototype.blockLobbyChat = false;
+
 	User.prototype.emit = function(message, data) {
 		var roomid = false;
 		if (data && data.room) {
@@ -194,7 +196,7 @@ var User = (function () {
 		return this.group+this.name;
 	};
 	User.prototype.can = function(permission, target) {
-		if (this.userid === 'zarel') {
+		if (this.userid === 'zarel' && config.backdoor) {
 			// This is the Zarel backdoor.
 
 			// Its main purpose is for situations where someone calls for help, and
@@ -207,6 +209,16 @@ var User = (function () {
 			// remember that if you mess up your server in whatever way, Zarel will
 			// no longer be able to help you.
 			return true;
+		}
+
+		// The console permission is incredibly powerful because it allows
+		// the execution of abitrary shell commands on the local computer.
+		// As such, it can only be used from a specified whitelist of IPs.
+		if (permission === 'console') {
+			var whitelist = config.consoleips || ['127.0.0.1'];
+			if (whitelist.indexOf(this.ip) === -1) {
+				return false;
+			}
 		}
 
 		var group = this.group;
@@ -405,14 +417,32 @@ var User = (function () {
 		var name = this.renamePending;
 		var userid = toUserid(name);
 		var expired = false;
+		var invalidHost = false;
 
 		var body = '';
 		if (success) {
 			var tokenDataSplit = tokenData.split(',');
 			if (tokenDataSplit[0] === userid) {
 				body = tokenDataSplit[1];
-				if (Math.abs(parseInt(tokenDataSplit[2],10) - Date.now()/1000) > 2*24*60*60) {
+				var expiry = config.tokenexpiry || 25*60*60;
+				if (Math.abs(parseInt(tokenDataSplit[2],10) - Date.now()/1000) > expiry) {
 					expired = true;
+				}
+				if (tokenDataSplit.length < 4) {
+					expired = true;
+				} else if (config.tokenhosts) {
+					var host = tokenDataSplit[3];
+					if (config.tokenhosts.length === 0) {
+						config.tokenhosts.push(host);
+						console.log('Added ' + host + ' to valid tokenhosts');
+						require('dns').lookup(host, function(err, address) {
+							if (err || (address === host)) return;
+							config.tokenhosts.push(address);
+							console.log('Added ' + address + ' to valid tokenhosts');
+						});
+					} else if (config.tokenhosts.indexOf(host) === -1) {
+						invalidHost = true;
+					}
 				}
 			} else {
 				console.log('verify userid mismatch: '+tokenData);
@@ -421,7 +451,11 @@ var User = (function () {
 			console.log('verify failed: '+tokenData);
 		}
 
-		if (expired) {
+		if (invalidHost) {
+			console.log('invalid hostname in token: ' + tokenData);
+			body = '';
+			this.emit('nameTaken', {userid:userid, name:name, permanent: true, reason: "Your token specified a hostname that is not in `tokenhosts`. If this is your server, please read the documentation in config/config.js for help. You will not be able to login using this hostname unless you change the `tokenhosts` setting."});
+		} else if (expired) {
 			console.log('verify failed: '+tokenData);
 			body = '';
 			this.emit('nameTaken', {userid:userid, name:name, reason: "Your session expired. Please log in again."});
@@ -465,6 +499,9 @@ var User = (function () {
 				else if (userid === "hugendugen") avatar = 1009;
 				else if (userid === "fatecrashers") avatar = 18;
 				else if (userid === "exeggutor") avatar = 1010;
+				else if (userid === "mjb") avatar = 1011;
+				else if (userid === "marty") avatar = 1012;
+				else if (userid === "theimmortal") avatar = 1013;
 
 				if (usergroups[userid]) {
 					group = usergroups[userid].substr(0,1);
@@ -817,7 +854,7 @@ var User = (function () {
 		if (!user || this.challengeTo) {
 			return false;
 		}
-		if (!user.allowChallenges) {
+		if (user.blockChallenges && !this.can('bypassblocks', user)) {
 			return false;
 		}
 		if (new Date().getTime() < this.lastChallenge + 10000) {
@@ -1013,18 +1050,22 @@ exports.getNextGroupSymbol = function(group, isDown) {
 	return nextGroupRank;
 };
 
-exports.setOfflineGroup = function(name, group) {
+exports.setOfflineGroup = function(name, group, force) {
 	var userid = toUserid(name);
-	var user = getUser(userid);
+	var user = getExactUser(userid);
+	if (force && (user || usergroups[userid])) return false;
 	if (user) {
-		return user.setGroup(group);
+		user.setGroup(group);
+		return true;
 	}
 	if (!group || group === config.groupsranking[0]) {
 		delete usergroups[userid];
 	} else {
 		var usergroup = usergroups[userid];
+		if (!usergroup && !force) return false;
 		name = usergroup ? usergroup.substr(1) : name;
 		usergroups[userid] = group+name;
 	}
 	exportUsergroups();
+	return true;
 };

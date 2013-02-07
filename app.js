@@ -8,7 +8,24 @@ try {
 	});
 } catch(e) {}
 
-require('sugar');
+/**
+ * Require a module, but display a helpful error message if it fails.
+ * This is currently only used in this file, and only for modules which are
+ * not bundled with node.js, because that should be adequate to convey the
+ * point to the user.
+ */
+function requireGracefully(path) {
+	try {
+		return require(path);
+	} catch (e) {
+		console.error("ERROR: " + e.message + ". Please run\n\n" +
+			"           npm install\n\n" +
+			"       or refer to README.md for more help running Pokemon Showdown.");
+		process.exit(1);
+	}
+}
+
+requireGracefully('sugar');
 
 fs = require('fs');
 if (!fs.existsSync) {
@@ -215,6 +232,22 @@ if (!fs.existsSync('./config/config.js')) {
 
 config = require('./config/config.js');
 
+if (config.watchconfig) {
+	fs.watchFile('./config/config.js', function(curr, prev) {
+		if (curr.mtime <= prev.mtime) return;
+		var oldconfig = config;
+		try {
+			for (var i in require.cache) delete require.cache[i];
+			config = require('./config/config.js');
+			console.log('Reloaded config/config.js');
+		} catch (e) {
+			// In case of an error in the new config file, just stick
+			// with the old one.
+			config = oldconfig;
+		}
+	});
+}
+
 /*
 var app = require('http').createServer()
   , io = require('socket.io').listen(app)
@@ -247,7 +280,7 @@ if (config.protocol !== 'io' && config.protocol !== 'eio') config.protocol = 'ws
 var app;
 var server;
 if (config.protocol === 'io') {
-	server = require('socket.io').listen(config.port).set('log level', 1);
+	server = requireGracefully('socket.io').listen(config.port).set('log level', 1);
 	server.set('transports', ['websocket', 'htmlfile', 'xhr-polling']); // temporary hack until https://github.com/LearnBoost/socket.io/issues/609 is fixed
 	//server.set('polling duration', 10);
 } else if (config.protocol === 'eio') {
@@ -255,7 +288,7 @@ if (config.protocol === 'io') {
 	server = require('engine.io').attach(app);
 } else {
 	app = require('http').createServer();
-	server = require('sockjs').createServer({sockjs_url: "http://cdn.sockjs.org/sockjs-0.3.min.js", log: function(severity, message) {
+	server = requireGracefully('sockjs').createServer({sockjs_url: "http://cdn.sockjs.org/sockjs-0.3.min.js", log: function(severity, message) {
 		if (severity === 'error') console.log('ERROR: '+message);
 	}});
 }

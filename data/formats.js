@@ -21,16 +21,16 @@ exports.BattleFormats = {
 		searchShow: true,
 		ruleset: ['Random Battle']
 	},
-	// seasonalseasoningsgreetings: {
-	// 	effectType: 'Format',
-	// 	name: "[Seasonal] Seasoning's Greetings",
-	// 	team: 'randomSeasonal',
-	// 	canUseRandomTeam: true,
-	// 	rated: true,
-	// 	challengeShow: true,
-	// 	searchShow: true,
-	// 	ruleset: ['PotD', 'Pokemon', 'Sleep Clause']
-	// },
+	/* seasonalseasoningsgreetings: {
+		effectType: 'Format',
+		name: "[Seasonal] Seasoning's Greetings",
+		team: 'randomSeasonal',
+		canUseRandomTeam: true,
+		rated: true,
+		challengeShow: true,
+		searchShow: true,
+		ruleset: ['PotD', 'Pokemon', 'Sleep Clause']
+	},
 	seasonalwinterwonderland: {
 		effectType: 'Format',
 		name: "[Seasonal] Winter Wonderland",
@@ -150,6 +150,17 @@ exports.BattleFormats = {
 			}
 		},
 		ruleset: ['PotD', 'Pokemon', 'Sleep Clause']
+	},*/
+	seasonalvalentineventure: {
+		effectType: 'Format',
+		name: "[Seasonal] Valentine Venture",
+		team: 'randomSeasonalVV',
+		gameType: 'doubles',
+		canUseRandomTeam: true,
+		rated: true,
+		challengeShow: true,
+		searchShow: true,
+		ruleset: ['PotD', 'Pokemon', 'Sleep Clause']
 	},
 	challengecup: {
 		effectType: 'Format',
@@ -160,6 +171,23 @@ exports.BattleFormats = {
 		challengeShow: true,
 		searchShow: true,
 		ruleset: ['Pokemon']
+	},
+	challengecup1vs1: {
+		effectType: 'Format',
+		name: "Challenge Cup 1-vs-1",
+		team: 'randomCC',
+		canUseRandomTeam: true,
+		rated: true,
+		challengeShow: true,
+		searchShow: true,
+		ruleset: ['Pokemon', 'Team Preview 1v1'],
+		onBegin: function() {
+			this.debug('Cutting down to 1');
+			this.p1.pokemon = this.p1.pokemon.slice(0, 1);
+			this.p1.pokemonLeft = this.p1.pokemon.length;
+			this.p2.pokemon = this.p2.pokemon.slice(0, 1);
+			this.p2.pokemonLeft = this.p2.pokemon.length;
+		}
 	},
 	ou: {
 		effectType: 'Format',
@@ -183,20 +211,19 @@ exports.BattleFormats = {
 	//	ruleset: ['Pokemon', 'Standard', 'Evasion Abilities Clause', 'Team Preview'],
 	//	banlist: ['Uber', 'Drizzle ++ Swift Swim', 'Soul Dew']
 	//},
-	// oususpecttest: {
-	// 	effectType: 'Format',
-	// 	name: "OU (suspect test)",
-	// 	challengeDefault: true,
-	// 	rated: true,
-	// 	challengeShow: true,
-	// 	searchShow: true,
-	// 	teambuilderFormat: 'ou',
-	// 	ruleset: ['Pokemon', 'Standard', 'Team Preview'],
-	// 	 banlist: [
-	// 		'Arceus-Bug', 'Arceus-Dark', 'Arceus-Dragon', 'Arceus-Electric', 'Arceus-Fighting', 'Arceus-Fire', 'Arceus-Flying', 'Arceus-Ghost', 'Arceus-Grass', 'Arceus-Ground', 'Arceus-Ice', 'Arceus', 'Arceus-Poison', 'Arceus-Psychic', 'Arceus-Rock', 'Arceus-Steel', 'Arceus-Water', 'Blaziken', 'Darkrai', 'Deoxys', 'Deoxys-Attack', 'Deoxys-Speed', 'Dialga', 'Excadrill', 'Giratina', 'Giratina-Origin', 'Groudon', 'Ho-Oh', 'Kyogre', 'Lugia', 'Manaphy', 'Mewtwo', 'Palkia', 'Rayquaza', 'Reshiram', 'Shaymin-Sky', 'Thundurus', 'Zekrom', 'Kyurem-White', 'Drizzle ++ Swift Swim', 'Soul Dew'
-	// 	] 
-	// 	banlist: ['Uber', 'Drizzle ++ Swift Swim', 'Soul Dew', 'Genesect']
-	// },
+	oususpecttest: {
+		effectType: 'Format',
+		name: "OU (suspect test)",
+		rated: true,
+		challengeShow: true,
+		searchShow: true,
+		teambuilderFormat: 'ou',
+		ruleset: ['Pokemon', 'Standard', 'Evasion Abilities Clause', 'Team Preview'],
+		//  banlist: [
+			// 'Arceus-Bug', 'Arceus-Dark', 'Arceus-Dragon', 'Arceus-Electric', 'Arceus-Fighting', 'Arceus-Fire', 'Arceus-Flying', 'Arceus-Ghost', 'Arceus-Grass', 'Arceus-Ground', 'Arceus-Ice', 'Arceus', 'Arceus-Poison', 'Arceus-Psychic', 'Arceus-Rock', 'Arceus-Steel', 'Arceus-Water', 'Blaziken', 'Darkrai', 'Deoxys', 'Deoxys-Attack', 'Deoxys-Speed', 'Dialga', 'Excadrill', 'Giratina', 'Giratina-Origin', 'Groudon', 'Ho-Oh', 'Kyogre', 'Lugia', 'Manaphy', 'Mewtwo', 'Palkia', 'Rayquaza', 'Reshiram', 'Shaymin-Sky', 'Thundurus', 'Zekrom', 'Kyurem-White', 'Drizzle ++ Swift Swim', 'Soul Dew'
+		// ] 
+		banlist: ['Uber', 'Drizzle ++ Swift Swim', 'Soul Dew', 'Deoxys-Defense']
+	},
 	cap: {
 		effectType: 'Format',
 		name: "CAP",
@@ -487,7 +514,7 @@ exports.BattleFormats = {
 			}
 		},
 		// no restrictions, for serious
-		ruleset: ['Pokemon', 'VGC Team Preview', 'Species Clause', 'Item Clause'],
+		ruleset: ['Pokemon', 'Team Preview VGC', 'Species Clause', 'Item Clause'],
 		banlist: ['Unreleased', 'Illegal', 'Sky Drop', 'Dark Void', 'Soul Dew',
 			'Mewtwo',
 			'Mew',
@@ -724,7 +751,7 @@ exports.BattleFormats = {
 			}
 		}
 	},
-	vgcteampreview: {
+	teampreviewvgc: {
 		onStartPriority: -10,
 		onStart: function() {
 			this.add('clearpoke');
@@ -737,6 +764,21 @@ exports.BattleFormats = {
 		},
 		onTeamPreview: function() {
 			this.makeRequest('teampreview', 4);
+		}
+	},
+	teampreview1v1: {
+		onStartPriority: -10,
+		onStart: function() {
+			this.add('clearpoke');
+			for (var i=0; i<this.sides[0].pokemon.length; i++) {
+				this.add('poke', this.sides[0].pokemon[i].side.id, this.sides[0].pokemon[i].details.replace(/Arceus(\-[a-zA-Z\?]+)?/, 'Arceus-*'));
+			}
+			for (var i=0; i<this.sides[1].pokemon.length; i++) {
+				this.add('poke', this.sides[1].pokemon[i].side.id, this.sides[1].pokemon[i].details.replace(/Arceus(\-[a-zA-Z\?]+)?/, 'Arceus-*'));
+			}
+		},
+		onTeamPreview: function() {
+			this.makeRequest('teampreview', 1);
 		}
 	},
 	teampreview: {
